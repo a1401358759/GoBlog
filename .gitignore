@@ -1,0 +1,13 @@
+logs/*
+tmp/*
+
+.DS_Store
+latest_log
+go.sum
+main
+.idea
+.vscode
+__debug_bin
+meta.cab
+blob
+dump.rdb

@@ -1,0 +1,16 @@
+version: "3"
+
+services:
+  server:
+    image: goblog:latest
+    build:
+      context: ../
+      dockerfile: deploy/dockerfile
+    container_name: goblog
+    restart: always
+    ports:
+      - '8888:8888'
+    external_links:
+      - cuse-redis
+      - cuse-nginx
+    network_mode: host

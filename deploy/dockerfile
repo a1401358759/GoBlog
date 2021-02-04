@@ -1,0 +1,18 @@
+FROM golang:alpine
+
+ENV GOPROXY=https://goproxy.cn,direct \
+    GO111MODULE=on \
+    CGO_ENABLED=1 \
+    TZ=Asia/Shanghai
+
+WORKDIR /go/src/goblog
+EXPOSE 8888
+
+COPY . .
+
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && \
+    set -eux && sed -i "s/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g" /etc/apk/repositories && \
+    apk add gcc musl-dev && \
+    go build -o server .
+
+CMD ["./server"]
