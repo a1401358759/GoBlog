@@ -3,7 +3,6 @@ package initialize
 import (
 	"goblog/core/global"
 	"goblog/modules/model"
-	"goblog/service"
 	"os"
 	"time"
 
@@ -40,92 +39,19 @@ func GormMysql() *gorm.DB {
 		os.Exit(0)
 		return nil
 	} else {
-		global.GLog.Info("mysql connect ping response:", zap.String("pong", "PONG"))
+		global.GLog.Info("mysql connect ping response:", zap.String("ping", "PONG"))
 		sqlDB, _ := db.DB()
 		sqlDB.SetMaxIdleConns(m.MaxIdleConns)
 		sqlDB.SetMaxOpenConns(m.MaxOpenConns)
 		sqlDB.SetConnMaxLifetime(time.Hour)
-		if callbackRegisterErr := db.Callback().Create().After("gorm:refresh_cache_after_create").Register("refresh_cache_after_create", RefreshCacheAfterCreateOrUpdate); callbackRegisterErr != nil {
-			global.GLog.Error("GORM callback [refresh_cache_after_create] register err:", zap.Any("err", callbackRegisterErr))
-		}
-		if callbackRegisterErr := db.Callback().Update().After("gorm:refresh_cache_after_update").Register("refresh_cache_after_update", RefreshCacheAfterCreateOrUpdate); callbackRegisterErr != nil {
-			global.GLog.Error("GORM callback [refresh_cache_after_update] register err:", zap.Any("err", callbackRegisterErr))
-		}
-		if callbackRegisterErr := db.Callback().Delete().After("gorm:refresh_cache_after_delete").Register("refresh_cache_after_delete", RefreshCacheAfterCreateOrUpdate); callbackRegisterErr != nil {
-			global.GLog.Error("GORM callback [refresh_cache_after_delete] register err:", zap.Any("err", callbackRegisterErr))
-		}
 		return db
-	}
-}
-
-func RefreshCacheAfterCreateOrUpdate(db *gorm.DB) {
-	tableName := db.Statement.Table
-	// flash table cache
-	if tableName == "sync_history" {
-		service.RefreshLastSyncHistory(false)
-	} else if tableName == "parent_uss_config" {
-		service.RefreshUssConfig(false)
-	} else if tableName == "server_configuration" {
-		service.RefreshServerConfig(false)
-	}
-	// flush api cache
-	if apiPatterns, ok := global.ApiCacheTableScope[tableName]; ok {
-		for _, apiPattern := range apiPatterns {
-			cacheKeys := global.GRedis.Keys(apiPattern).Val()
-			for _, cacheKey := range cacheKeys {
-				global.GRedis.Del(cacheKey)
-			}
-		}
 	}
 }
 
 // GormDBTables 注册数据库表专用
 func MysqlTables(db *gorm.DB) {
 	err := db.AutoMigrate(
-		&model.ServerConfiguration{},
-		&model.ComputerTarget{},
-		&model.ComputerInGroup{},
-		&model.ComputerTargetGroup{},
-		&model.ParentUssConfig{},
-		&model.Deployment{},
-		&model.DeadDeployment{},
-		&model.Bundle{},
-		&model.RevisionPrerequisite{},
-		&model.UpdateForPrerequisite{},
-		&model.Rules{},
-		&model.Revision{},
-		&model.Update{},
-		&model.UpdateLanguage{},
-		&model.AutoApproveRules{},
-		&model.DownloadFiles{},
-		&model.RevisionInCategory{},
-		&model.SyncHistory{},
-		&model.UpdateStatus{},
-		&model.Dss{},
-		&model.EulaAcceptance{},
-		&model.UpdateStatusPerComputer{},
-		&model.ComputerSummaryForMicrosoftUpdates{},
-		&model.StatisticsForPerUpdate{},
-		&model.BasicData{},
-		&model.ExtendedData{},
-		&model.MiscData{},
-		&model.ComputerLiveStats{},
-		&model.User{},
-		&model.Role{},
-		&model.RolesUsers{},
-		&model.Property{},
-		&model.DSSStatement{},
-		&model.ComputerStatement{},
-		&model.RevisionStatement{},
-		&model.RevisionInstallStatistics{},
-		&model.ComputerRevisionInstallStats{},
-		&model.Superseded{},
-		&model.MSRCSeverityStatistics{},
-		&model.ComputerUpdateRelation{},
-		&model.CustomReportRules{},
-		&model.OperateRecord{},
-		&model.ClientComputerSummaryRollup{},
-		&model.ClientComputerActivityRollup{},
+		&model.Author{},
 	)
 	if err != nil {
 		global.GLog.Error("register table failed", zap.Any("err", err))

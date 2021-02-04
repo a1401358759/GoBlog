@@ -5,8 +5,6 @@ import (
 	"github.com/gookit/color"
 	"go/importer"
 	"goblog/core/global"
-	initialize "goblog/core/init"
-	"goblog/modules/model"
 	"io/ioutil"
 )
 
@@ -39,21 +37,9 @@ func ImportProcedure() {
 	}
 }
 
-func FlushRedis() {
-	return
-}
-
-func ResetImport() {
-	var sh model.SyncHistory
-	global.GDb.Last(&sh).Update("Pending", false)
-	// 初始化redis服务
-	initialize.Redis()
-	global.GRedis.HDel("lastSyncHistory")
-}
-
 func RefreshIsonserver() {
 	query := "update files set IsOnServer=1;"
-	if err := global.GDb.Exec(string(query)); err.Error != nil {
+	if err := global.GDb.Exec(query); err.Error != nil {
 		fmt.Println(err)
 	} else {
 		fmt.Println("refresh isonserver " + " success!" + "all files are on server!")
