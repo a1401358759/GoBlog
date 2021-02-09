@@ -152,5 +152,5 @@ type Comments struct {
 }
 
 func (Comments) TableName() string {
-	return "comments"
+	return "comment"
 }
