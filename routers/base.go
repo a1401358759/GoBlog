@@ -11,11 +11,12 @@ func Routers() *gin.Engine {
 	// 全局中间件
 	Router.Use(middleware.Cors())
 	// api 路由组及中间件
-	ApiGroup := Router.Group("api/v2/")
+	ApiGroup := Router.Group("api/v1/")
 	ApiGroup.Use(middleware.GinRecovery(true))
-	ApiGroup.Use(middleware.LoginAuth())
+	// ApiGroup.Use(middleware.LoginAuth())
 	{
 		InitAdminRouter(ApiGroup)
+		InitWebRouter(ApiGroup)
 	}
 	global.GLog.Info("router register success")
 	return Router

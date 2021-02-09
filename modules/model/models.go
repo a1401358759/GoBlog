@@ -60,6 +60,7 @@ type Article struct {
 	Tags             []Tag          `gorm:"many2many:article_tags"`
 	ClassificationID int            `gorm:"primary_key;column:classification_id" json:"classification_id"`
 	Classification   Classification `gorm:"ForeignKey:classification_id;AssociationForeignKey:classification_id;not null"`
+	Content          string         `gorm:"type:longtext;column:content;comment:文章内容" json:"content"`
 	PublishTime      time.Time      `gorm:"autoCreateTime;column:publish_time;comment:发表时间" json:"publish_time"`
 	LastUpdate       time.Time      `gorm:"autoUpdateTime;column:last_update;comment:最后修改时间" json:"last_update"`
 	Count            int            `gorm:"column:count;default:0;comment:文章点击数" json:"count"`
@@ -148,7 +149,7 @@ func (Visitor) TableName() string {
 type Comments struct {
 	ID        int       `gorm:"primary_key;column:id" json:"id"`
 	UserID    int       `gorm:"primary_key;column:user_id" json:"user_id"`
-	Visitor   Visitor   `gorm:"ForeignKey:user_id;AssociationForeignKey:user_id;not null"`
+	User      Visitor   `gorm:"ForeignKey:user_id;AssociationForeignKey:user_id;not null"`
 	ReplyToID int       `gorm:"primary_key;column:reply_to_id;null" json:"reply_to_id"`
 	ReplyTo   Visitor   `gorm:"ForeignKey:reply_to_id;AssociationForeignKey:reply_to_id;null"`
 	Content   string    `gorm:"type:longtext;column:content" json:"content"`
