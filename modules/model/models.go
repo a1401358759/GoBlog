@@ -17,11 +17,12 @@ func (Author) TableName() string {
 
 // OwnerMessage 主人寄语
 type OwnerMessage struct {
-	ID      int    `gorm:"primary_key;column:id" json:"id"`
-	Summary string `gorm:"type:varchar(100);column:summary;comment:简介;default:null" json:"summary"`
-	Message string `gorm:"type:longtext;column:message;comment:邮件;default:null" json:"message"`
-	Editor  int    `gorm:"column:editor;comment:编辑器类型;default:1" json:"editor"`
-	TimeModelMiXin
+	ID         int       `gorm:"primary_key;column:id" json:"id"`
+	Summary    string    `gorm:"type:varchar(100);column:summary;comment:简介;default:null" json:"summary"`
+	Message    string    `gorm:"type:longtext;column:message;comment:邮件;default:null" json:"message"`
+	Editor     int       `gorm:"column:editor;comment:编辑器类型;default:1" json:"editor"`
+	CreatedAt  time.Time `gorm:"autoCreateTime;column:created_at;comment:创建时间" json:"created_at"`
+	LastUpdate time.Time `gorm:"autoUpdateTime;column:last_update;comment:最后修改时间" json:"last_update"`
 }
 
 func (OwnerMessage) TableName() string {
@@ -115,6 +116,17 @@ type Music struct {
 
 func (Music) TableName() string {
 	return "music"
+}
+
+// Subscription 邮件订阅
+type Subscription struct {
+	ID    int    `gorm:"primary_key;column:id" json:"id"`
+	Email string `gorm:"type:varchar(128);column:email;comment:订阅邮箱" json:"email"`
+	TimeModelMiXin
+}
+
+func (Subscription) TableName() string {
+	return "subscription"
 }
 
 // Visitor 访客表
