@@ -52,6 +52,15 @@ func GormMysql() *gorm.DB {
 func MysqlTables(db *gorm.DB) {
 	err := db.AutoMigrate(
 		&model.Author{},
+		&model.OwnerMessage{},
+		&model.Tag{},
+		&model.Classification{},
+		&model.Article{},
+		&model.Links{},
+		&model.CarouselImg{},
+		&model.Music{},
+		&model.Visitor{},
+		&model.Comments{},
 	)
 	if err != nil {
 		global.GLog.Error("register table failed", zap.Any("err", err))
