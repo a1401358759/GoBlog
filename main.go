@@ -39,8 +39,7 @@ func main() {
 	initialize.MysqlTables(global.GDb)
 	// 初始化redis服务
 	initialize.Redis()
-	// 初始化下载队列
-	initialize.QueueClient()
+
 	db, _ := global.GDb.DB()
 	defer func() {
 		// 关闭数据库链接

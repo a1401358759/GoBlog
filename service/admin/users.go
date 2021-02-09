@@ -2,36 +2,33 @@ package admin
 
 import (
 	"crypto/sha256"
-	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
-	"go.uber.org/zap"
 	"goblog/core/global"
-	"goblog/modules/model"
 	"strconv"
 	"time"
 )
 
-//JWTSign
+// JWTSign
 type JWTSign struct {
 	sign []byte
 }
 
-//NewSign
+// NewSign
 func NewSign() *JWTSign {
 	return &JWTSign{
 		[]byte("cus-be-better"),
 	}
 }
 
-//GetToken
+// GetToken
 func (j JWTSign) GetToken(param JWTParams) (token string, err error) {
 	tokenHandler := jwt.NewWithClaims(jwt.SigningMethodHS256, param)
 	token, err = tokenHandler.SignedString(j.sign)
 	return
 }
 
-//ParseToken
+// ParseToken
 func (j JWTSign) ParseToken(token string) (*JWTParams, error) {
 	t, err := jwt.ParseWithClaims(token, &JWTParams{}, func(token *jwt.Token) (interface{}, error) {
 		return j.sign, nil
@@ -49,7 +46,7 @@ func (j JWTSign) ParseToken(token string) (*JWTParams, error) {
 	return nil, fmt.Errorf("token无效")
 }
 
-//JWTParams
+// JWTParams
 type JWTParams struct {
 	UID      int    `json:"uid"`
 	Email    string `json:"Email"`
@@ -57,7 +54,7 @@ type JWTParams struct {
 	jwt.StandardClaims
 }
 
-//GenerateToken
+// GenerateToken
 func GenerateToken(email string, pwd string, uid int) string {
 	sign := NewSign()
 	tokenParam := JWTParams{
@@ -77,23 +74,17 @@ func GenerateToken(email string, pwd string, uid int) string {
 	return token
 }
 
-//RefreshTokenExpires
+// RefreshTokenExpires
 func RefreshTokenExpires(uid int, token string, login bool) {
 	// 打开单用户登录模式，则每次删除所有token，然后再设置本次登录的token
 	// 只有登录时做此操作，不然同时操作可能会导致token竞态
-	if global.GConfig.CUS.OnlyOneUser && login {
-		tokenKeys := global.GRedis.Keys("token-*").Val()
-		for _, tokenKey := range tokenKeys {
-			global.GRedis.Del(tokenKey)
-		}
-	}
 	err := global.GRedis.Set("token-"+strconv.Itoa(uid), token, 15*time.Minute).Err()
 	if err != nil {
 		fmt.Println("token 有效期设置失败")
 	}
 }
 
-//CheckTokenExpires
+// CheckTokenExpires
 func CheckTokenExpires(uid int, token string) bool {
 	t, _ := global.GRedis.Get("token-" + strconv.Itoa(uid)).Result()
 	if t == "" {
@@ -107,41 +98,40 @@ func CheckTokenExpires(uid int, token string) bool {
 }
 
 func PwdEncrypt(str string) string {
-	//enc := unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM).NewEncoder()
 	sum := sha256.Sum256([]byte(str + "omega"))
 	res := fmt.Sprintf("%x", sum)
 	return res
 }
 
-func LoginCheck(email, password string) (int, string, error) {
-	var user model.User
-	global.GDb.Where("Email=?", email).First(&user)
-	pwd := PwdEncrypt(password)
-	if pwd == user.Password {
-		token := GenerateToken(email, password, user.UserID)
-		return user.UserID, token, nil
-	} else {
-		return 0, "", errors.New("密码错误")
-	}
-}
+// func LoginCheck(email, password string) (int, string, error) {
+// 	var user model.User
+// 	global.GDb.Where("Email=?", email).First(&user)
+// 	pwd := PwdEncrypt(password)
+// 	if pwd == user.Password {
+// 		token := GenerateToken(email, password, user.UserID)
+// 		return user.UserID, token, nil
+// 	} else {
+// 		return 0, "", errors.New("密码错误")
+// 	}
+// }
 
-func ChangePwd(email, password, newPassword string) error {
-	changer := global.GDb.Table("user").Where("Email=?", email).Where("Password=?", PwdEncrypt(password)).Update("Password", PwdEncrypt(newPassword))
-	if changer.Error != nil {
-		return changer.Error
-	}
-	if changer.RowsAffected == 0 {
-		return errors.New("账号或密码错误")
-	} else {
-		var u model.User
-		if err := global.GDb.Table("user").Where("Email=?", email).First(&u).Error; err != nil {
-			global.GLog.Error("用户查找失败:", zap.Any("err", err))
-			return err
-		}
-		Logout(u.UserID)
-		return nil
-	}
-}
+// func ChangePwd(email, password, newPassword string) error {
+// 	changer := global.GDb.Table("user").Where("Email=?", email).Where("Password=?", PwdEncrypt(password)).Update("Password", PwdEncrypt(newPassword))
+// 	if changer.Error != nil {
+// 		return changer.Error
+// 	}
+// 	if changer.RowsAffected == 0 {
+// 		return errors.New("账号或密码错误")
+// 	} else {
+// 		var u model.User
+// 		if err := global.GDb.Table("user").Where("Email=?", email).First(&u).Error; err != nil {
+// 			global.GLog.Error("用户查找失败:", zap.Any("err", err))
+// 			return err
+// 		}
+// 		Logout(u.UserID)
+// 		return nil
+// 	}
+// }
 
 func Logout(uid int) {
 	global.GRedis.Del("token-" + strconv.Itoa(uid))

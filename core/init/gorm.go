@@ -39,7 +39,7 @@ func GormMysql() *gorm.DB {
 		os.Exit(0)
 		return nil
 	} else {
-		global.GLog.Info("mysql connect ping response:", zap.String("ping", "PONG"))
+		global.GLog.Info("mysql connect ping response:", zap.String("pong", "PONG"))
 		sqlDB, _ := db.DB()
 		sqlDB.SetMaxIdleConns(m.MaxIdleConns)
 		sqlDB.SetMaxOpenConns(m.MaxOpenConns)
