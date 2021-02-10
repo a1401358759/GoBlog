@@ -1,7 +1,9 @@
 package web
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 	"goblog/core/global"
 	"goblog/modules/model"
 	"goblog/utils"
@@ -30,7 +32,17 @@ func GetBlogList(c *gin.Context, pageNum, pageSize int) ([]model.Article, int64)
 
 // BlogDetail 博客详情
 func BlogDetail(blogID string) (blog model.Article) {
-	global.GDb.Preload(clause.Associations).First(&blog, blogID)
+	db := global.GDb
+
+	db.Preload(clause.Associations).First(&blog, blogID)
+
+	var tags []model.Tag
+	sql := fmt.Sprintf("select tag.* from tag join article_tags a on tag.id = a.tag_id where article_id = %s;", blogID)
+	if err := db.Raw(sql).Find(&tags).Error; err != nil {
+		global.GLog.Error("BlogDetail", zap.Any("err", err))
+	}
+	blog.Tags = tags
+
 	return
 }
 

@@ -31,8 +31,9 @@ func (OwnerMessage) TableName() string {
 
 // Tag 标签
 type Tag struct {
-	ID   int    `gorm:"primary_key;column:id" json:"id"`
-	Name string `gorm:"type:varchar(20);column:name;comment:标签名" json:"name"`
+	ID       int        `gorm:"primary_key;column:id" json:"id"`
+	Name     string     `gorm:"type:varchar(20);column:name;comment:标签名" json:"name"`
+	Articles []*Article `gorm:"many2many:article_tags"`
 	TimeModelMiXin
 }
 
