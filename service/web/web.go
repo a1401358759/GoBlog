@@ -46,19 +46,19 @@ func BlogDetail(blogID string) (blog model.Article) {
 	return
 }
 
-// 标签列表
+// GetTagList 标签列表
 func GetTagList() (tagList []map[string]interface{}) {
 	global.GDb.Model(&model.Tag{}).Select("id", "name").Scan(&tagList)
 	return
 }
 
-// 分类列表
+// GetClassificationList 分类列表
 func GetClassificationList() (classifications []map[string]interface{}) {
 	global.GDb.Model(&model.Classification{}).Select("id", "name").Scan(&classifications)
 	return
 }
 
-// 友情链接列表
+// GetLinkList 友情链接列表
 func GetLinkList() (links []map[string]interface{}) {
 	global.GDb.Model(&model.Links{}).Select("name", "link", "avatar", "desc").Scan(&links)
 	utils.Shuffle(links) // 随机打乱顺序

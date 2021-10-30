@@ -19,7 +19,7 @@ import (
 	"time"
 )
 
-// 三元表达式
+// If 三元表达式
 func If(condition bool, trueVal, falseVal interface{}) interface{} {
 	if condition {
 		return trueVal
@@ -63,7 +63,7 @@ func (q QueryFilter) Handle() string {
 	return name + " " + SignMap[q.Op] + " '" + val.(string) + "' "
 }
 
-// 通过两重循环过滤重复元素
+// RemoveRepByLoop 通过两重循环过滤重复元素
 func RemoveRepByLoop(slc []int) []int {
 	var result []int // 存放结果
 	for i := range slc {
@@ -81,7 +81,7 @@ func RemoveRepByLoop(slc []int) []int {
 	return result
 }
 
-// 通过map主键唯一的特性过滤重复元素
+// RemoveRepByMap 通过map主键唯一的特性过滤重复元素
 func RemoveRepByMap(slc []int) []int {
 	var result []int
 	tempMap := map[int]byte{} // 存放不重复主键
@@ -95,7 +95,7 @@ func RemoveRepByMap(slc []int) []int {
 	return result
 }
 
-// 元素去重
+// RemoveRep 元素去重
 func RemoveRep(slc []int) []int {
 	if len(slc) < 1024 {
 		// 切片长度小于1024的时候，循环来过滤
@@ -106,7 +106,7 @@ func RemoveRep(slc []int) []int {
 	}
 }
 
-// 计算最大值
+// Maximum 计算最大值
 func Maximum(l []int) (max int) {
 	max = l[0]
 	for _, v := range l {
@@ -117,7 +117,7 @@ func Maximum(l []int) (max int) {
 	return
 }
 
-// 计算最小值
+// Minimum 计算最小值
 func Minimum(l []int) (min int) {
 	min = l[0]
 	for _, v := range l {
@@ -128,7 +128,7 @@ func Minimum(l []int) (min int) {
 	return
 }
 
-// xml转义
+// XMLEscape xml转义
 func XMLEscape(xmlStr string) string {
 	return strings.Replace(strings.Replace(xmlStr, "<", "&lt;", -1), ">", "&gt;", -1)
 }
@@ -137,7 +137,7 @@ func XMLUnEscape(xmlStr string) string {
 	return strings.Replace(strings.Replace(xmlStr, "&lt;", "<", -1), "&gt;", ">", -1)
 }
 
-// 判断array，Slice或者Map内是否包含某元素
+// Contain 判断array，Slice或者Map内是否包含某元素
 func Contain(obj interface{}, array interface{}) bool {
 	targetValue := reflect.ValueOf(array)
 	switch reflect.TypeOf(array).Kind() {
@@ -155,7 +155,7 @@ func Contain(obj interface{}, array interface{}) bool {
 	return false
 }
 
-// 判断字符串切片内是否包含某元素
+// ContainStr 判断字符串切片内是否包含某元素
 func ContainStr(val string, slice []string) bool {
 	for i := 0; i < len(slice); i++ {
 		if slice[i] == val {
@@ -165,7 +165,7 @@ func ContainStr(val string, slice []string) bool {
 	return false
 }
 
-// 判断整型切片内是否包含某元素
+// ContainInt 判断整型切片内是否包含某元素
 func ContainInt(val int, slice []int) bool {
 	for i := 0; i < len(slice); i++ {
 		if slice[i] == val {
@@ -175,7 +175,7 @@ func ContainInt(val int, slice []int) bool {
 	return false
 }
 
-// 字符串拼接函数
+// StringBuilder 字符串拼接函数
 func StringBuilder(p []string) string {
 	var b strings.Builder
 	l := len(p)
@@ -185,7 +185,7 @@ func StringBuilder(p []string) string {
 	return b.String()
 }
 
-// anchor转化为时间
+// AnchorToDatetime anchor转化为时间
 func AnchorToDatetime(anchor string) (lastChangeNumber int, anchorTime time.Time, err error) {
 	paramList := strings.Split(anchor, ",")
 	lastChangeNumber, err = strconv.Atoi(paramList[0])
@@ -193,14 +193,14 @@ func AnchorToDatetime(anchor string) (lastChangeNumber int, anchorTime time.Time
 	return
 }
 
-// 时间转anchor
+// DatetimeToAnchor 时间转anchor
 func DatetimeToAnchor(dt time.Time, lastChangeNumber int) (anchor string) {
 	dtStr := dt.Format("2006-01-02 15:04:05.000")
 	numberStr := fmt.Sprintf("%d,", lastChangeNumber)
 	return StringBuilder([]string{numberStr, dtStr})
 }
 
-// 跨类型切片去重函数
+// SliceDistinct 跨类型切片去重函数
 func SliceDistinct(slc interface{}) (ret []interface{}, err error) {
 	if reflect.TypeOf(slc).Kind() != reflect.Slice {
 		return ret, errors.New("no slice type data used in Func SliceDistinct")
@@ -239,7 +239,7 @@ func DelStringItem(vs []string, s string) []string {
 	return vs
 }
 
-// 多个结构体或者Map组合成为一个字典
+// StructMakeUp 多个结构体或者Map组合成为一个字典
 func StructMakeUp(args ...interface{}) map[string]interface{} {
 	var data = make(map[string]interface{})
 	for _, arg := range args {
@@ -256,13 +256,13 @@ func StructMakeUp(args ...interface{}) map[string]interface{} {
 	return data
 }
 
-// 获取当前服务器的名称
+// GetPCName 获取当前服务器的名称
 func GetPCName() string {
 	pcName, _ := os.Hostname()
 	return pcName
 }
 
-// 获取方法名(异步函数callback时使用)
+// GetFuncName 获取方法名(异步函数callback时使用)
 func GetFuncName(f interface{}) string {
 	funcPath := runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name()
 	funcModules := strings.Split(funcPath, "/")
@@ -270,7 +270,7 @@ func GetFuncName(f interface{}) string {
 	return funcName
 }
 
-// number类型的interface转换为标准int
+// ToInt number类型的interface转换为标准int
 func ToInt(i interface{}) int {
 	if i == nil {
 		return 0
@@ -293,7 +293,7 @@ func ToInt(i interface{}) int {
 	}
 }
 
-// int切片转换为string切片。大量的sql in操作时需要用到
+// SliceIntToString int切片转换为string切片。大量的sql in操作时需要用到
 func SliceIntToString(src []int) (drc []string) {
 	for _, i := range src {
 		drc = append(drc, strconv.Itoa(i))
@@ -317,7 +317,7 @@ func GetUnEscapeJsonEncoder() (*json.Encoder, *bytes.Buffer) {
 	return jsonEncoder, bf
 }
 
-// int silce >> string slice
+// IntMapStr int silce >> string slice
 func IntMapStr(intSlice []int) []string {
 	var strSlice []string
 	for _, i := range intSlice {
@@ -326,7 +326,7 @@ func IntMapStr(intSlice []int) []string {
 	return strSlice
 }
 
-// string silce >> int slice
+// StrMapInt string silce >> int slice
 func StrMapInt(intSlice []string) []int {
 	var strSlice []int
 	for _, i := range intSlice {
@@ -336,14 +336,14 @@ func StrMapInt(intSlice []string) []int {
 	return strSlice
 }
 
-// md5加密
+// MD5V md5加密
 func MD5V(str []byte) string {
 	h := md5.New()
 	h.Write(str)
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-// snappy
+// SnappyEncode snappy
 func SnappyEncode(data string) string {
 	return base64.StdEncoding.EncodeToString(snappy.Encode(nil, []byte(data)))
 }
